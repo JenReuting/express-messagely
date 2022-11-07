@@ -3,6 +3,7 @@
 const bcrypt = require('bcrypt');
 const { BCRYPT_WORK_FACTOR } = require('../config');
 const db = require("../db");
+const { BadRequestError } = require('../expressError');
 
 /** User of the site. */
 
@@ -22,9 +23,10 @@ class User {
         first_name,
         last_name,
         phone,
-        join_at)
+        join_at,
+        last_login_at)
       VALUES
-        ($1, $2, $3, $4, $5, current_timestamp)
+        ($1, $2, $3, $4, $5, current_timestamp, current_timestamp)
       RETURNING username, password, first_name, last_name, phone`,
       [username, hashedPassword, first_name, last_name, phone]
     );
@@ -74,8 +76,6 @@ class User {
     `);
 
     return result.rows;
-
-
   }
 
   /** Get: get user by username
@@ -88,6 +88,24 @@ class User {
    *          last_login_at } */
 
   static async get(username) {
+    const result = await db.query(`
+      SELECT username,
+      first_name,
+      last_name,
+      phone,
+      join_at,
+      last_login_at
+      FROM users
+      WHERE username = $1`, [username]
+    );
+
+    const user = result.rows[0];
+
+    if (user) {
+      return user;
+    } else {
+      throw new BadRequestError();
+    }
   }
 
   /** Return messages from this user.
@@ -99,6 +117,19 @@ class User {
    */
 
   static async messagesFrom(username) {
+    const result = db.query(`
+      SELECT id,
+        to_user,
+        body,
+        sent_at,
+        read_at,
+      FROM messages AS m
+      JOIN users AS fU ON (m.from_username = fU.username)
+      WHERE fU.username = $1`, [username]
+    )
+
+    return result.rows;
+
   }
 
   /** Return messages to this user.
