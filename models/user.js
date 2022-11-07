@@ -3,14 +3,14 @@
 const bcrypt = require('bcrypt');
 const { BCRYPT_WORK_FACTOR } = require('../config');
 const db = require("../db");
-const { BadRequestError } = require('../expressError');
+const { BadRequestError, NotFoundError } = require('../expressError');
 
 /** User of the site. */
 
 class User {
 
   /** Register new user. Returns
-   *    {username, password, first_name, last_name, phone}
+   *    {username, password, first_name, last_name, phone} TODO: make better.
    */
 
   static async register({ username, password, first_name, last_name, phone }) {
@@ -36,7 +36,14 @@ class User {
       [username, hashedPassword, first_name, last_name, phone]
     );
 
-    return result.rows[0];
+    const user = result.rows[0];
+
+    if (!user) {
+      throw new NotFoundError();
+    }
+    else {
+      return user;
+    }
   }
 
   /** Authenticate: is username/password valid? Returns boolean. */
@@ -50,11 +57,10 @@ class User {
     );
 
     const user = result.rows[0];
+    const auth = await bcrypt.compare(password, user.password) === true;
 
-    if (user) {
-      return (await bcrypt.compare(password, user.password) === true);
-    }
-    throw new UnauthorizedError("Invalid user/password");
+    return auth;
+
   }
 
   /** Update last_login_at for user */
@@ -63,8 +69,15 @@ class User {
     const result = await db.query(
       `UPDATE users
       SET last_login_at = current_timestamp
-      WHERE username = $1`, [username]
+      WHERE username = $1
+      RETURNING username`, [username] //
     );
+    const user = result.rows[0];
+
+    if (!user) {
+      throw new NotFoundError();
+    }
+
   }
 
   /** All: basic info on all users:
@@ -109,7 +122,7 @@ class User {
     if (user) {
       return user;
     } else {
-      throw new BadRequestError();
+      throw new NotFoundError();
     }
   }
 
