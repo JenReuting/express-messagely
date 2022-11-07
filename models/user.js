@@ -53,12 +53,29 @@ class User {
   /** Update last_login_at for user */
 
   static async updateLoginTimestamp(username) {
+    const result = await db.query(
+      `UPDATE users
+      SET last_login_at = current_timestamp
+      WHERE username = $1`, [username]
+    );
   }
 
   /** All: basic info on all users:
    * [{username, first_name, last_name}, ...] */
 
   static async all() {
+
+    const result = await db.query(`
+    SELECT username,
+    first_name,
+    last_name
+    FROM users
+    ORDER BY last_name, first_name
+    `);
+
+    return result.rows;
+
+
   }
 
   /** Get: get user by username
