@@ -1,7 +1,7 @@
 {
   "name": "messagely",
   "version": "1.1.0",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
     "test": "jest -i",
     "start": "node server.js"
