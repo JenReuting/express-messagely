@@ -1,5 +1,8 @@
 "use strict";
 
+const app = require("../app");
+const User = require("../models/user");
+
 const Router = require("express").Router;
 const router = new Router();
 
@@ -9,6 +12,15 @@ const router = new Router();
  * => {users: [{username, first_name, last_name}, ...]}
  *
  **/
+
+router.get('/', async function (req, res, next) {
+
+  const users = await User.all();
+  console.log('users from route:', users);
+
+  return res.json({ users });
+
+});
 
 
 /** GET /:username - get detail of users.
