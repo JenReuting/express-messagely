@@ -21,12 +21,11 @@ router.post("/login", async function (req, res, next) {
   if (req.body === undefined) throw new BadRequestError();
 
   const { username, password } = req.body;
-  console.log(req.body);
 
   //if verified, put token on res.locals.user
   if (await User.authenticate(username, password)) {
     const token = jwt.sign({ username }, SECRET_KEY);
-    User.updateLoginTimestamp(username);
+    await User.updateLoginTimestamp(username);
     return res.json({ token });
   } else {
     throw new UnauthorizedError("Invalid username and/or password");
@@ -35,11 +34,26 @@ router.post("/login", async function (req, res, next) {
 });
 
 /** POST /register: registers, logs in, and returns token.
+ * Handles the Register POST route. Registers a user with provided data,
+ * and on success logs in user and returns a token. Else if not successful
+ * throws a bad request error.
  *
  * {username, password, first_name, last_name, phone} => {token}.
  */
 
+router.post("/register", async function (req, res, next) {
+  if (req.body === undefined) throw new BadRequestError();
 
+  const { username } = await User.register(req.body);
+
+  if (!username) throw new BadRequestError();
+
+  const token = jwt.sign({ username }, SECRET_KEY);
+  User.updateLoginTimestamp(username);
+
+  return res.json({ token });
+
+});
 
 
 
