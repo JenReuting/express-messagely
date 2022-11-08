@@ -30,7 +30,7 @@ router.get('/', async function (req, res, next) {
 router.get('/:username', async function (req, res, next) {
   const user = await User.get(req.params.username);
   return res.json({ user });
-})
+});
 
 
 /** GET /:username/to - get messages to user
@@ -42,6 +42,14 @@ router.get('/:username', async function (req, res, next) {
  *                 from_user: {username, first_name, last_name, phone}}, ...]}
  *
  **/
+router.get('/:username/to', async function (req, res, next) {
+  const messages = await User.messagesTo(req.params.username);
+  console.log('messages >>>>>>>>>>>>>>>>>>:', messages);
+  return res.json({ messages });
+
+
+
+});
 
 
 /** GET /:username/from - get messages from user
