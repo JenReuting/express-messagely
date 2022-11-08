@@ -64,7 +64,7 @@ describe("Test Message class", function () {
 
     Message.markRead(m.id);
     const result = await db.query("SELECT read_at FROM messages WHERE id=$1",
-        [m.id]);
+      [m.id]);
     expect(result.rows[0].read_at).toEqual(expect.any(Date));
   });
 

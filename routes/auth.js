@@ -2,6 +2,8 @@
 
 const Router = require("express").Router;
 const router = new Router();
+const jwt = require("jsonwebtoken");
+
 
 const { authenticateJWT } = require("../middleware/auth.js");
 const User = require("../models/user");
@@ -19,13 +21,13 @@ router.post("/login", async function (req, res, next) {
   if (req.body === undefined) throw new BadRequestError();
 
   const { username, password } = req.body;
-  const
+  console.log(req.body);
 
   //if verified, put token on res.locals.user
   if (await User.authenticate(username, password)) {
-    const token = jwt.sign({username}, SECRET_KEY, {iat: 60*60 });
+    const token = jwt.sign({ username }, SECRET_KEY);
     User.updateLoginTimestamp(username);
-    return res.json({_token: token});
+    return res.json({ token });
   } else {
     throw new UnauthorizedError("Invalid username and/or password");
   }
@@ -36,5 +38,12 @@ router.post("/login", async function (req, res, next) {
  *
  * {username, password, first_name, last_name, phone} => {token}.
  */
+
+
+
+
+
+
+
 
 module.exports = router;

@@ -38,12 +38,8 @@ class User {
 
     const user = result.rows[0];
 
-    if (!user) {
-      throw new NotFoundError();
-    }
-    else {
-      return user;
-    }
+    return user;
+
   }
 
   /** Authenticate: is username/password valid? Returns boolean. */
@@ -57,9 +53,7 @@ class User {
     );
 
     const user = result.rows[0];
-    const auth = await bcrypt.compare(password, user.password) === true;
-
-    return auth;
+    return user && await bcrypt.compare(password, user.password) === true;
 
   }
 
@@ -74,9 +68,8 @@ class User {
     );
     const user = result.rows[0];
 
-    if (!user) {
-      throw new NotFoundError();
-    }
+    if (!user) throw new NotFoundError(`No such user: ${username}`);
+
 
   }
 
@@ -119,11 +112,10 @@ class User {
 
     const user = result.rows[0];
 
-    if (user) {
-      return user;
-    } else {
-      throw new NotFoundError();
-    }
+    if (!user) throw new NotFoundError(`No such user: ${username}`);
+
+    return user;
+
   }
 
   /** Return messages from this user.
