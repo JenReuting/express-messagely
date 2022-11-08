@@ -106,6 +106,31 @@ it("Shows the messages sent to a user", async function () {
 
 
 );
+it("Shows the messages sent from a user", async function () {
+  let response = await request(app).get("/users/test/from");
+
+  expect(response.body).toEqual({
+    messages: [{
+      id: expect.any(Number),
+      to_user: {
+        username: "test2",
+        first_name: "Test2",
+        last_name: "Testy2",
+        phone: "+14155552222",
+      },
+      body: "new",
+      sent_at: expect.any(String),
+      read_at: null,
+    }]
+  });
+
+  expect(response.statusCode).toEqual(200);
+
+
+}
+
+
+);
 
 
 
