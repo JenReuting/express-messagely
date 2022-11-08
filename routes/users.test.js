@@ -18,14 +18,12 @@ describe("User routes", function () {
       last_name: "Testy",
       phone: "+14155550000",
     });
-    console.log('user: ', u);
   });
 
 
 
   it("Shows a list of all the users", async function () {
     let response = await request(app).get("/users/");
-    console.log('response from TEST ROUTE', response.body);
 
     expect(response.body).toEqual({
       users: [{
@@ -37,14 +35,25 @@ describe("User routes", function () {
     );
 
     expect(response.statusCode).toEqual(200);
+  });
+});
 
+it("Shows the detail of one user", async function() {
+  let response = await request(app).get("/users/test");
 
-
+  expect(response.body).toEqual({
+    user: {
+      username: "test",
+      first_name: "Test",
+      last_name: "Testy",
+      phone: "+14155550000",
+      last_login_at: expect.any(String),
+      join_at: expect.any(String)
+    }
   });
 
-
-
-});
+  expect(response.statusCode).toEqual(200);
+})
 
 
 afterAll(async function () {

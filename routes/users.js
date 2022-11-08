@@ -16,7 +16,6 @@ const router = new Router();
 router.get('/', async function (req, res, next) {
 
   const users = await User.all();
-  console.log('users from route:', users);
 
   return res.json({ users });
 
@@ -28,6 +27,10 @@ router.get('/', async function (req, res, next) {
  * => {user: {username, first_name, last_name, phone, join_at, last_login_at}}
  *
  **/
+router.get('/:username', async function (req, res, next) {
+  const user = await User.get(req.params.username);
+  return res.json({ user });
+})
 
 
 /** GET /:username/to - get messages to user
